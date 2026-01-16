@@ -80,3 +80,5 @@ htmlcov/
 
 # Artifacts
 *.pyc
+
+.env
