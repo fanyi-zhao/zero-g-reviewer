@@ -130,24 +130,15 @@ python -m cr_agent.main --sample
 ## Phase-Based Observability
 
 ```
-PHASE 1: Input Validation
-📄 Diff: 48,805 chars, 1,159 lines
-📁 Files: 8
+PHASE 1: Workflow Initialization (gpt-5-mini-2025-08-07)
+✓ Built LangGraph workflow with parallel execution
 
-PHASE 2: Context Analysis (Drift Prevention)
-📦 Dependencies: low impact
-🏗️ Patterns: None detected
-🔥 Hotspots: churn=0.00
-👤 Preferences: 0 signals
+PHASE 2: Executing Review Workflow
+   Steps: Context Analysis → Routing → [Parallel Agents] → Synthesis
+⏳ Running agent workflow (async)...
 
-PHASE 3: Routing Decision
-📊 Lines: 1006 (threshold: 300)
-🚦 Decision: DELEGATE to sub-agents
-
-PHASE 4: LLM Code Review
-📝 Prompt: 51,863 chars
-⏳ Calling LLM...
-
-PHASE 5: Review Complete
-✓ Review generated successfully
+PHASE 3: Final Output
+# Code Review Results
+## 1. Executive Summary: Request Changes
+...
 ```
