@@ -14,8 +14,23 @@ AI Code Review Agent using LangGraph for multi-agent orchestration in monorepo e
 
 ## Quick Start
 
+### Prerequisites
+
+- [uv](https://github.com/astral-sh/uv) installed
+
+### Installation
+
 ```bash
-pip install -e .
+# Setup virtual environment
+uv venv
+source .venv/bin/activate
+
+# Install Dependencies
+uv pip install -e .
+
+# [Optional] Install Dev Dependencies for Testing
+uv pip install -e ".[dev]"
+
 export OPENAI_API_KEY="your-key"
 export GITHUB_TOKEN="your-token"
 
