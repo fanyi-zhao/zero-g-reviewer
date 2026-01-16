@@ -30,18 +30,12 @@ uv pip install -e .
 
 # [Optional] Install Dev Dependencies for Testing
 uv pip install -e ".[dev]"
-
-export OPENAI_API_KEY="your-key"
-export GITHUB_TOKEN="your-token"
-
-# Review a GitHub PR
-python -m cr_agent.main --github vllm-project/vllm --pr 32263
-
-# Run sample review
-python -m cr_agent.main --sample
 ```
 
-## Seeding Knowledge
+## 1. Seeding Knowledge
+
+> [!IMPORTANT]
+> **Recommended:** Seeding the knowledge base is optional but highly recommended. It provides the agent with deep context about dependencies and patterns, significantly improving review quality.
 
 ```bash
 # GitHub
@@ -54,6 +48,21 @@ export GITLAB_URL="https://gitlab.example.com"
 export GITLAB_TOKEN="token"
 export GITLAB_PROJECT_ID="12345"
 python scripts/seed_knowledge.py
+```
+
+## 2. Run PR Review
+
+Once the knowledge base is seeded, you can run the agent:
+
+```bash
+export OPENAI_API_KEY="your-key"
+export GITHUB_TOKEN="your-token"
+
+# Review a GitHub PR
+python -m cr_agent.main --github vllm-project/vllm --pr 32263
+
+# Run sample review (Offline test)
+python -m cr_agent.main --sample
 ```
 
 ## Documentation
