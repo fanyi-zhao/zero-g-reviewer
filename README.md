@@ -1,5 +1,8 @@
 # Zero-G Reviewer
 
+![CI](https://github.com/fanyi-zhao/zero-g-reviewer/actions/workflows/ci.yml/badge.svg)
+![Coverage](https://raw.githubusercontent.com/fanyi-zhao/zero-g-reviewer/badges/coverage.svg)
+
 AI Code Review Agent using LangGraph for multi-agent orchestration in monorepo environments.
 
 ## Features
