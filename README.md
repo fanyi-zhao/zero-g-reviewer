@@ -56,10 +56,12 @@ Once the knowledge base is seeded, you can run the agent:
 
 ```bash
 export OPENAI_API_KEY="your-key"
-export GITHUB_TOKEN="your-token"
 
 # Review a GitHub PR
-python -m cr_agent.main --github vllm-project/vllm --pr 32263
+GITHUB_TOKEN="your-token" python -m cr_agent.main --github vllm-project/vllm --pr 32263
+
+# Review a GitLab MR
+GITLAB_TOKEN="your-token" python -m cr_agent.main --gitlab 12345 --mr 1
 
 # Run sample review (Offline test)
 python -m cr_agent.main --sample
