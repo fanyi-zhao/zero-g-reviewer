@@ -88,14 +88,46 @@ def detect_provider() -> Provider | None:
         return None
 
 
-def load_config() -> Config:
-    """Load configuration from environment variables."""
+def load_config(
+    github_repo: str | None = None,
+    github_token: str | None = None,
+    gitlab_project_id: str | None = None,
+    gitlab_token: str | None = None,
+) -> Config:
+    """Load configuration from environment variables with optional overrides."""
     # Check for OpenAI API key first
     if not os.environ.get("OPENAI_API_KEY"):
         print("❌ Missing required: OPENAI_API_KEY")
         sys.exit(1)
     
-    provider = detect_provider()
+    # 1. Determine Provider
+    # Priority: explicit args > env vars
+    has_gitlab = (gitlab_project_id is not None) or all([
+        os.environ.get("GITLAB_URL"),
+        os.environ.get("GITLAB_TOKEN"),
+        os.environ.get("GITLAB_PROJECT_ID"),
+    ])
+    
+    has_github = (github_repo is not None) or all([
+        os.environ.get("GITHUB_TOKEN"),
+        os.environ.get("GITHUB_REPO"),
+    ])
+    
+    provider = None
+    if has_gitlab and has_github:
+         # If args specify one, choose that. Else error.
+         if gitlab_project_id and not github_repo:
+             provider = Provider.GITLAB
+         elif github_repo and not gitlab_project_id:
+             provider = Provider.GITHUB
+         else:
+            print("❌ Ambiguous configuration: Both GitLab and GitHub variables/args are set.")
+            print("   Please set only ONE provider's environment variables or arguments.")
+            sys.exit(1)
+    elif has_gitlab:
+        provider = Provider.GITLAB
+    elif has_github:
+        provider = Provider.GITHUB
     
     if provider is None:
         print("❌ No provider configuration found.\n")
@@ -116,12 +148,12 @@ def load_config() -> Config:
     )
     
     if provider == Provider.GITLAB:
-        config.gitlab_url = os.environ["GITLAB_URL"]
-        config.gitlab_token = os.environ["GITLAB_TOKEN"]
-        config.gitlab_project_id = os.environ["GITLAB_PROJECT_ID"]
+        config.gitlab_url = os.environ.get("GITLAB_URL")
+        config.gitlab_token = gitlab_token or os.environ.get("GITLAB_TOKEN")
+        config.gitlab_project_id = gitlab_project_id or os.environ.get("GITLAB_PROJECT_ID")
     else:  # GitHub
-        config.github_token = os.environ["GITHUB_TOKEN"]
-        config.github_repo = os.environ["GITHUB_REPO"]
+        config.github_token = github_token or os.environ.get("GITHUB_TOKEN")
+        config.github_repo = github_repo or os.environ.get("GITHUB_REPO")
     
     return config
 
@@ -587,14 +619,25 @@ class PreferenceStore:
 # Main Execution
 # =============================================================================
 
-async def main() -> None:
-    """Main execution flow."""
+async def run_seed(args: Any = None) -> None:
+    """Main execution flow for seeding."""
     print("=" * 60)
     print("🌱 CR Agent Knowledge Seeding (Multi-Provider)")
     print("=" * 60 + "\n")
     
+    # Extract overrides from args if present
+    github_repo = getattr(args, "github", None) if args else None
+    # We might need to handle token passing via CLI later, but currently main.py doesn't expose a 'token' flag.
+    # It relies on env vars usually, but we are enabling "similar" arguments.
+    # main.py defines --github, --pr, --gitlab, --mr. 
+    # github_repo corresponds to --github (repo name).
+    gitlab_project_id = getattr(args, "gitlab", None) if args else None
+    
     # Load configuration
-    config = load_config()
+    config = load_config(
+        github_repo=github_repo,
+        gitlab_project_id=gitlab_project_id,
+    )
     print(f"✓ Configuration loaded (Provider: {config.provider.value.upper()})\n")
     
     # Initialize components using factory
@@ -660,4 +703,4 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(run_seed())

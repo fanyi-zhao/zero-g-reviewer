@@ -20,6 +20,7 @@ from langchain_core.language_models import BaseChatModel
 
 from cr_agent.state import FinalReview
 from cr_agent.graph import build_graph, review_merge_request
+from cr_agent.seed import run_seed
 from cr_agent.tools import (
     DependencyImpactTool,
     DesignPatternTool,
@@ -286,6 +287,9 @@ def parse_args() -> argparse.Namespace:
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(description="CR Agent - AI Code Review System")
     
+    # Optional subcommand: 'seed' or None (review)
+    parser.add_argument("command", nargs="?", choices=["seed"], help="Subcommand: 'seed' to populate knowledge base. If omitted, runs review mode.")
+
     parser.add_argument("--github", metavar="REPO", help="GitHub repo (owner/repo)")
     parser.add_argument("--pr", type=int, metavar="NUMBER", help="GitHub PR number")
     parser.add_argument("--gitlab", metavar="PROJECT_ID", help="GitLab project ID")
@@ -300,6 +304,11 @@ def parse_args() -> argparse.Namespace:
 async def main_async() -> None:
     """Async main function."""
     args = parse_args()
+    
+    if args.command == "seed":
+        await run_seed(args)
+        return
+
     logger = ReviewLogger(verbose=not args.quiet)
     
     if args.sample:

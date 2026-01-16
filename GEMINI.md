@@ -23,7 +23,7 @@ The system operates on an "Antigravity" architecture that prioritizes context an
 *   `src/cr_agent/routing/`: Contains logic for routing decisions (`router.py`) and context pruning (`file_filter.py`).
 *   `src/cr_agent/agents/`: Implementations of individual agents (`security_agent.py`, `performance_agent.py`, etc.) and output parsers (`output_parsers.py`).
 *   `src/cr_agent/tools/`: "Drift Prevention" tools (`dependency_impact.py`, `design_patterns.py`, `hotspot_detector.py`, `user_preferences.py`).
-*   `scripts/seed_knowledge.py`: Utility to populate the vector store with historical PR data.
+*   `src/cr_agent/seed.py`: Utility to populate the vector store with historical PR data.
 *   `CR_ORCHESTRATOR_PROMPT.md`: The system prompt serving as the PRD/Source of Truth.
 
 ## Building and Running
@@ -31,7 +31,7 @@ The system operates on an "Antigravity" architecture that prioritizes context an
 ### Installation
 
 ```bash
-pip install -e .
+uv pip install -e .
 ```
 
 ### Configuration
@@ -63,7 +63,7 @@ python -m cr_agent.main --sample
 
 **Seed Knowledge Base:**
 ```bash
-python scripts/seed_knowledge.py
+python -m cr_agent.main seed
 ```
 
 **Run Tests:**

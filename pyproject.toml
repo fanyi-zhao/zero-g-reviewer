@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "cr-agent-system"
+name = "zerog-cr"
 version = "0.1.0"
-description = "AI Code Review Agent using LangGraph for multi-agent orchestration"
+description = "Zero-G Reviewer: AI Code Review Agent using LangGraph"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
@@ -21,10 +21,15 @@ dependencies = [
     "sentence-transformers>=3.0.0",
 ]
 
+[project.scripts]
+zerog-cr = "cr_agent.main:main"
+
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0.0",
     "pytest-asyncio>=0.24.0",
+    "build>=1.4.0",
+    "twine>=6.2.0",
 ]
 
 [tool.hatch.build.targets.wheel]

@@ -11,27 +11,29 @@ cr-agent-system/
 ├── pyproject.toml                    # Dependencies: langgraph, langchain, chromadb
 ├── CR_ORCHESTRATOR_PROMPT.md         # System prompt
 ├── doc/
-│   ├── DESIGN.md                     # Architecture design
-│   └── WALKTHROUGH.md                # This file
+│   └── DESIGN.md                     # Architecture design
 ├── scripts/
-│   └── seed_knowledge.py             # Multi-provider knowledge seeding
-└── src/cr_agent/
-    ├── state.py                      # AgentState + Pydantic models
-    ├── graph.py                      # LangGraph workflow
-    ├── main.py                       # Production CLI
-    ├── tools/
-    │   ├── dependency_impact.py      # Dependency analyzer
-    │   ├── design_patterns.py        # Pattern retrieval
-    │   ├── hotspot_detector.py       # Git history analyzer
-    │   └── user_preferences.py       # ChromaDB RAG search
-    ├── agents/
-    │   ├── general_reviewer.py       # Lite mode (≤300 lines)
-    │   ├── security_agent.py         # SQLi, XSS, Auth
-    │   ├── performance_agent.py      # N+1 detection
-    │   └── domain_agent.py           # Business logic
-    └── routing/
-        ├── router.py                 # 300 lines / 3 domains threshold
-        └── file_filter.py            # Context pruning
+│   └── test_vllm_pr.py               # E2E verification script
+├── tests/                            # Pytest suite
+├── .github/                          # CI workflows
+├── src/cr_agent/
+│   ├── state.py                      # AgentState + Pydantic models
+│   ├── graph.py                      # LangGraph workflow
+│   ├── main.py                       # Production CLI
+│   ├── seed.py                       # Knowledge seeding utility
+│   ├── tools/
+│   │   ├── dependency_impact.py      # Dependency analyzer
+│   │   ├── design_patterns.py        # Pattern retrieval
+│   │   ├── hotspot_detector.py       # Git history analyzer
+│   │   └── user_preferences.py       # ChromaDB RAG search
+│   ├── agents/
+│   │   ├── general_reviewer.py       # Lite mode (≤300 lines)
+│   │   ├── security_agent.py         # SQLi, XSS, Auth
+│   │   ├── performance_agent.py      # N+1 detection
+│   │   └── domain_agent.py           # Business logic
+│   └── routing/
+│       ├── router.py                 # 300 lines / 3 domains threshold
+│       └── file_filter.py            # Context pruning
 ```
 
 ---
@@ -52,18 +54,6 @@ python -m cr_agent.main --github vllm-project/vllm --pr 32263
 
 ---
 
-## Knowledge Seeding
-
-Populate the vector store with team coding standards:
-
-```bash
-# Seed from GitHub
-export GITHUB_TOKEN="token"
-export GITHUB_REPO="owner/repo"
-python scripts/seed_knowledge.py
-
-# Seed from GitLab  
-export GITLAB_URL="https://gitlab.example.com"
 export GITLAB_TOKEN="token"
 export GITLAB_PROJECT_ID="12345"
 python scripts/seed_knowledge.py
