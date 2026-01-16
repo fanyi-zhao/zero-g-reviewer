@@ -14,6 +14,12 @@ AI Code Review Agent using LangGraph for multi-agent orchestration in monorepo e
 ```bash
 pip install -e .
 export OPENAI_API_KEY="your-key"
+export GITHUB_TOKEN="your-token"
+
+# Review a GitHub PR
+python -m cr_agent.main --github vllm-project/vllm --pr 32263
+
+# Run sample review
 python -m cr_agent.main --sample
 ```
 
@@ -31,6 +37,11 @@ export GITLAB_TOKEN="token"
 export GITLAB_PROJECT_ID="12345"
 python scripts/seed_knowledge.py
 ```
+
+## Documentation
+
+- **[Design Document](doc/DESIGN.md)** — Architecture, state machine, tool definitions
+- **[Implementation Walkthrough](doc/WALKTHROUGH.md)** — Project structure, validation results
 
 ## License
 
