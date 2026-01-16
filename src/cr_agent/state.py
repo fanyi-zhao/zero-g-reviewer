@@ -5,7 +5,8 @@ Defines the TypedDict schema for LangGraph state management throughout
 the code review workflow.
 """
 
-from typing import TypedDict, Literal, Any
+from typing import TypedDict, Literal, Any, Annotated
+import operator
 from pydantic import BaseModel, Field
 
 
@@ -67,6 +68,16 @@ class FinalReview(BaseModel):
     suggestions: list[dict[str, Any]] = Field(default_factory=list)
 
 
+def merge_results(
+    current: dict[str, SubAgentResult], 
+    new_results: dict[str, SubAgentResult]
+) -> dict[str, SubAgentResult]:
+    """Reducer to merge new sub-agent results into the dictionary."""
+    if not current:
+        return new_results
+    return {**current, **new_results}
+
+
 class AgentState(TypedDict, total=False):
     """
     Main state schema for the LangGraph workflow.
@@ -95,7 +106,8 @@ class AgentState(TypedDict, total=False):
     domain_diff: FilteredDiff
     
     # --- Sub-Agent Results ---
-    sub_agent_results: dict[str, SubAgentResult]
+    # Annotated with reducer to allow concurrent writes from parallel agents
+    sub_agent_results: Annotated[dict[str, SubAgentResult], merge_results]
     general_review_result: SubAgentResult | None
     
     # --- Final Output ---
