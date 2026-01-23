@@ -267,12 +267,31 @@ class ReviewAgent:
         if len(self.review_plan.files_to_review) > 30:
             files_reviewed += f"\n- *...and {len(self.review_plan.files_to_review) - 30} more*"
 
-        # Summarize analysis notes
-        analysis_summary = "\n\n---\n\n".join(self.analysis_notes[-5:])  # Last 5 notes
+        # Prepare context for synthesis
+        # Instead of generic analysis notes, we feed the structured findings
+        # to the LLM so it can write a high-quality executive summary.
+        findings_summary = []
+        for i, f in enumerate(self.findings, 1):
+            findings_summary.append(f"{i}. [{f.severity.value.upper()}] {f.title} ({f.file_path})")
+            # Include first line of description for context
+            first_line = f.description.split('\n')[0][:100]
+            findings_summary.append(f"   {first_line}...")
 
+        # Include initial analysis for context
+        initial_context = self.analysis_notes[0] if self.analysis_notes else ""
+        
+        # Combine into a token-efficient context
+        analysis_context = f"""
+Initial Analysis:
+{initial_context}
+
+Identified Findings ({len(self.findings)}):
+{chr(10).join(findings_summary)}
+"""
+        
         prompt = SYNTHESIS_PROMPT.format(
             files_reviewed=files_reviewed,
-            analysis_notes=analysis_summary[:10000],  # Limit size
+            analysis_notes=analysis_context,
         )
 
         response = self._run_agent_loop(prompt)

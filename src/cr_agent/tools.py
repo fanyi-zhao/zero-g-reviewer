@@ -224,8 +224,18 @@ class ToolExecutor:
         try:
             content = self.repo.get_file_content(file_path, ref)
             if content:
-                context["content"] = content
-                context["line_count"] = len(content.split("\n"))
+                lines = content.split("\n")
+                total_lines = len(lines)
+                context["line_count"] = total_lines
+                
+                # Check for large files
+                max_lines = params.get("max_lines", 2000)
+                if total_lines > max_lines and not start_line:
+                    context["content"] = "\n".join(lines[:max_lines])
+                    context["truncated"] = True
+                    context["warning"] = f"File truncated. Showing first {max_lines} of {total_lines} lines. Use start_line/end_line to view specific sections."
+                else:
+                    context["content"] = content
             else:
                 context["content_error"] = "File not found at ref"
         except GitError as e:
