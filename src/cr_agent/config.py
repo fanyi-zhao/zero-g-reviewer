@@ -61,6 +61,10 @@ class Settings(BaseSettings):
         le=200,
         description="Maximum lines of context to fetch per file",
     )
+    extra_instructions: str | None = Field(
+        default="CodeReviewInstructions.md",
+        description="Path to a markdown file containing custom review instructions",
+    )
     verbosity: int = Field(
         default=1,
         ge=0,

@@ -9,6 +9,10 @@ SYSTEM_PROMPT = """You are an expert code reviewer analyzing a GitLab Merge Requ
 3. **Provide Suggestions**: Offer concrete, actionable improvements
 4. **Be Constructive**: Keep feedback professional and helpful
 
+## Custom Guidelines
+
+{custom_instructions}
+
 ## Review Categories
 
 When analyzing code, consider:

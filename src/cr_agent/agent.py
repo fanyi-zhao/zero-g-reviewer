@@ -3,6 +3,7 @@
 import json
 import logging
 from typing import Any
+from pathlib import Path
 
 from anthropic import Anthropic
 
@@ -63,6 +64,9 @@ class ReviewAgent:
         # Initialize tool executor
         self.tool_executor = ToolExecutor(config, gitlab_client, repo)
 
+        # Load custom instructions
+        self.system_prompt = self._load_system_prompt()
+
         # Review state
         self.mr_info: MergeRequestInfo | None = None
         self.changes: list[ChangedFile] = []
@@ -70,6 +74,27 @@ class ReviewAgent:
         self.review_plan: ReviewPlan | None = None
         self.findings: list[Finding] = []
         self.analysis_notes: list[str] = []
+
+    def _load_system_prompt(self) -> str:
+        """Load and format the system prompt with custom instructions."""
+        custom_instructions = ""
+        
+        if self.settings.extra_instructions:
+            try:
+                # Try to find instructions file in repo
+                instructions_path = Path(self.config.local_repo_path) / self.settings.extra_instructions
+                if instructions_path.exists() and instructions_path.is_file():
+                    custom_instructions = instructions_path.read_text(encoding="utf-8")
+                    logger.info(f"Loaded custom instructions from {self.settings.extra_instructions}")
+                else:
+                    logger.debug(f"Custom instructions file not found: {self.settings.extra_instructions}")
+            except Exception as e:
+                logger.warning(f"Failed to load custom instructions: {e}")
+
+        if not custom_instructions:
+            custom_instructions = "No specific custom guidelines provided."
+
+        return SYSTEM_PROMPT.format(custom_instructions=custom_instructions)
 
     def run(self) -> ReviewResult:
         """
@@ -319,7 +344,7 @@ Identified Findings ({len(self.findings)}):
             response = self.anthropic.messages.create(
                 model=self.settings.llm_model,
                 max_tokens=self.settings.llm_max_tokens,
-                system=SYSTEM_PROMPT,
+                system=self.system_prompt,
                 tools=TOOL_DEFINITIONS,  # type: ignore
                 messages=messages,
             )

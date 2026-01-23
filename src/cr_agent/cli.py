@@ -98,6 +98,13 @@ def review(
         "--max-diff",
         help="Maximum characters of diff to process",
     ),
+    instructions: Optional[str] = typer.Option(
+        None,
+        "--instructions",
+        "-i",
+        envvar="CR_AGENT_EXTRA_INSTRUCTIONS",
+        help="Path to custom instructions file (default: CodeReviewInstructions.md)",
+    ),
     verbosity: int = typer.Option(
         1,
         "--verbose",
@@ -133,6 +140,7 @@ def review(
       - CR_AGENT_PROJECT_ID: GitLab project ID/path
       - CR_AGENT_LLM_BASE_URL: Claude-compatible API endpoint
       - CR_AGENT_LLM_MODEL: Model to use (default: claude-sonnet-4-20250514)
+      - CR_AGENT_EXTRA_INSTRUCTIONS: Custom instructions file path
     """
     setup_logging(verbosity)
 
@@ -150,6 +158,8 @@ def review(
             env_overrides["max_files"] = max_files
         if max_diff_chars != 100000:
             env_overrides["max_diff_chars"] = max_diff_chars
+        if instructions:
+            env_overrides["extra_instructions"] = instructions
         env_overrides["verbosity"] = verbosity
 
         settings = Settings(**env_overrides)  # type: ignore[arg-type]

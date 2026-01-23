@@ -183,6 +183,28 @@ All findings are compiled into a structured review with:
 - Test commands
 - Pre-merge checklist
 
+## Custom Instructions
+
+You can customize the reviewer's behavior by placing a markdown file in your repository. By default, the agent looks for **`CodeReviewInstructions.md`** in the repository root.
+
+**Example instructions:**
+```markdown
+# Review Guidelines
+
+- **Ignore**: Please ignore all files in `tests/legacy/`.
+- **Focus**: We are migrating to Pydantic v2, so flag any v1 usage.
+- **Style**: Ensure all docstrings follow Google style.
+- **Critical**: Any usage of `eval()` must be a blocker.
+```
+
+You can point to a different file using the `--instructions` flag or environment variable:
+
+```bash
+cr-agent review 42 --instructions .github/cr-agent-config.md
+# OR
+export CR_AGENT_EXTRA_INSTRUCTIONS=.github/cr-agent-config.md
+```
+
 ## Output Format
 
 The review is formatted as a GitLab-compatible markdown comment:
